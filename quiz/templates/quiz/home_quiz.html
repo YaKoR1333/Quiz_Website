@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block sidebar %}
+    {% include 'inc/_sidebar.html' %}
+{% endblock %}
+{% block content %}
+    {% for item in quiz %}
+        <div class="card mb-3">
+            <div class="card-header">
+                Категория: <a href="{{ item.get_absolute_url }}">{{ item.category }}</a>
+            </div>
+            <div class="card-body">
+                <div class="media">
+                    <div class="media-body">
+                        <h5 class="card-title">{{ item.topic }}</h5>
+                        <div class="card-info">
+                            <p class="card-text">{{ item.description }}</p>
+                            <p class="card-text">Количество вопросов: {{ item.number_of_questions }}</p>
+                            <a href="{{ item.get_absolute_url }}" class="btn btn-primary">Пройти тест</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

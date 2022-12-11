@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block scripts %}
+    <script src="{% static 'quiz/js/quiz_detail.js' %} " defer></script>
+{% endblock scripts %}
+
+{% block title %}
+    {{ quiz_item.topic }}
+{% endblock title %}
+
+{% block sidebar %}
+    {% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+    {{ quiz_item.topic }}
+    <form id="quiz_form" class="mt-3 mb-3">
+        {% csrf_token %}
+        <div id="quiz_box"></div>
+        <button type="submit" class="btn btn-primary mt-3">Следующий вопрос</button>
+    </form>
+{% endblock %}
