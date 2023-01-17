@@ -14,10 +14,12 @@
 {% endblock %}
 
 {% block content %}
-    {{ quiz_item.topic }}
+    <b>{{ quiz_item.topic }}</b>
     <form id="quiz_form" class="mt-3 mb-3">
         {% csrf_token %}
         <div id="quiz_box"></div>
-        <button type="submit" class="btn btn-primary mt-3">Следующий вопрос</button>
+        <button type="submit" class="btn btn-primary mt-3">Отправить</button>
     </form>
+    <div id="score-box"></div>
+    <div id="result-box"></div>
 {% endblock %}

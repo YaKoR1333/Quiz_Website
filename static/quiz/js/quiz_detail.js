@@ -2,7 +2,8 @@ console.log('quiz_website')
 const url = window.location.href
 
 const quizBox = document.getElementById('quiz_box')
-
+const scoreBOX = document.getElementById('score-box')
+const resultBOX = document.getElementById('result-box')
 
 $.ajax({
     type: 'GET',
@@ -41,12 +42,11 @@ const sendData = () => {
     const data = {}
     data['csrfmiddlewaretoken'] = csrf[0].value
     elements.forEach(el => {
-        if (el.checked )  {
-            data[el.name] += el.value + ', '
-        } else {
-            if (!data[el.name]) {
-                data[el.name] = null
-            }
+        if (!data.hasOwnProperty(el.name)) {
+            data[el.name] = ''
+        }
+        if (el.checked) {
+            data[el.name] += el.value + ','
         }
     })
 
@@ -55,7 +55,38 @@ const sendData = () => {
         url:`${url}save`,
         data: data,
         success: function (response){
-            console.log(response)
+            const results = response.results
+            quizForm.classList.add('d-none')
+
+            scoreBOX.innerHTML = `процент правильных ответов: ${response.score.toFixed(2)} %`
+
+            results.forEach(res => {
+                const resDiv = document.createElement('div')
+                for (const [question, resp] of Object.entries(res)){
+                    resDiv.innerHTML += question
+                    const cls = ['mt-3', 'mb-3']
+                    resDiv.classList.add(...cls)
+
+                    if (resp == 'not answered') {
+                        resDiv.innerHTML += '- нет ответа'
+                        resDiv.classList.add('text-danger')
+                    }
+                    else {
+                        const answer = resp['answered']
+                        const correct = resp['correct_answers']
+
+                        if (JSON.stringify(answer) == JSON.stringify(correct)) {
+                            resDiv.classList.add('text-success')
+                            resDiv.innerHTML += `Ваш ответ: ${answer}`
+                        } else {
+                            resDiv.classList.add('text-danger')
+                            resDiv.innerHTML += ` | правильный ответ: ${correct}`
+                            resDiv.innerHTML += ` | Ваш ответ: ${answer}`
+                        }
+                    }
+                }
+                resultBOX.append(resDiv)
+            })
         },
         error: function (error){
             console.log(error)

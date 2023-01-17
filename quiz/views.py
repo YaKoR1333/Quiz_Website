@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormView
 
+from .logic import scored_logic
 from .models import Quiz, Category, Question, Answer, Result
 from .forms import UserRegisterFrom, UserLoginForm
 
@@ -89,49 +90,7 @@ def is_ajax(request):
 
 def quiz_save_view(request, pk):
     if is_ajax(request=request):
-        questions = []
         data = request.POST
         data_ = dict(data.lists())
         data_.pop('csrfmiddlewaretoken')
-        # print(data)
-        print(data_)
-
-        for k in data_.keys():
-            question = Question.objects.get(text=k)
-            questions.append(question)
-
-        user = request.user
-        quiz = Quiz.objects.get(pk=pk)
-
-        score = 0
-        multiplier = 100 / quiz.number_of_questions
-        results = []
-        correct_answers = None
-
-        for q in questions:
-            a_selected = request.POST.get(q.text)
-            # print(a_selected)
-
-            if a_selected != '':
-                question_answers = Answer.objects.filter(question=q)
-                # print(question_answers)
-                for a in question_answers:
-                    if a_selected == a.text:
-                        if a.correct:
-                            score += 1
-                            correct_answers = a.text
-                    else:
-                        if a.correct:
-                            correct_answers = a.text
-
-                results.append({str(q): {'correct_answers': correct_answers, 'answered': a_selected}})
-            else:
-                results.append({str(q): 'not answered'})
-
-        score_ = score * multiplier
-        Result.objects.create(quiz=quiz, user=user, score=score_)
-
-    return JsonResponse({'score': score_, 'results': results})
-
-
-
+        return scored_logic(data_, request, pk)
